@@ -1,0 +1,217 @@
+.app-page-login{
+    height: 100vh;
+    background-color: #efede2;
+    background-position: center;
+    background-size: cover;
+    &__wrapper{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+    }
+    &__card{
+        background-color: #ffffff;
+        width: 100%;
+        max-width: 500px;
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+        h2{
+            margin:0 0 10px 0;
+            font-size: 28px;
+            color: #262626;
+        }
+        p{
+            margin:0;
+            color: #838383;
+        }
+    }
+    &__formgroup{
+        display: flex;
+        flex-direction: column;
+    }
+    &__field{
+        margin: 10px 0;
+    }
+    &__forgotpassword{
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 10px;
+    }
+    &__button{
+        display: flex;
+        justify-content: center;
+        margin-top:20px;
+        .MuiButtonBase-root{
+            font-weight: 600;
+            .MuiSvgIcon-root{
+                margin-right: 5px;
+                font-size: 20px;
+            }
+        }
+    }
+    &__rememberpassswprd{
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+}
+
+.page-card {
+    width: 100%;
+    max-width: 400px;
+    padding: 40px 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px #eaeaea;
+    background-color: #ffffff;
+}
+.login-container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-top: 15px;
+}
+.form-group {
+    margin-bottom: 15px;
+}
+.orwith{
+    width: 100%;
+    border-top: 1px solid #777;
+    margin: 30px 0 15px 0;
+    display: flex;
+    justify-content: center;
+}
+.orwith span{
+    font-size: 15px;
+    font-weight: 600;
+    padding: 3px 10px;
+    margin-top: -12px;
+    background-color: #ffffff;
+}
+.spinner {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    margin: 0 auto;
+  }
+  
+  .spinner-inner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    border-left-color: #7986cb; 
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @media screen and (min-width: 768px){
+.jumbotron {
+    padding-top: 48px;
+    padding-bottom: 48px;
+}
+  }
+.jumbotron {
+    padding-top: 30px;
+    padding-bottom: 30px;
+    margin-bottom: 30px;
+    color: inherit;
+    background-color: #eee;
+}
+.text-center {
+    text-align: center;
+}
+.actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.actions > div {
+    margin-right: 20px;
+}
+.actions a {
+    padding: 6px 12px;
+    background: #2068F3;
+    border: 1px solid #2068F3;
+    color: #ffffff;
+    text-decoration: none;
+    display: flex;
+}
+.actions a.danger {
+    padding: 6px 12px;
+    background: #ff0000;
+    border: 1px solid #ff0000;
+    color: #ffffff;
+    text-decoration: none;
+    display: flex;
+    cursor: pointer;
+}
+.agents-list h4{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+    font-size: 16px;
+}
+.agents-list h4 .form-group{
+    height: 20px;
+    padding: 0;
+    margin: 0!important;
+    width: 120px;
+}
+.agents-list .form-group1{
+    width: 400px;
+}
+.charts-container{
+    width: 600px;
+    display: flex;
+    gap: 30px;
+}
+.charts-flex {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-bottom: 50px;
+}
+.app-table-component{
+    width: fit-content;
+}
+.app-table-container{
+    display: flex;
+    justify-content: space-around;
+}
+.login-btn {
+    padding: 10px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 15px;
+    width: 100%;
+    color: #ffffff;
+    background-color: #2068F3;
+    margin-top: 30px;
+    border: 1px solid #2068F3;
+}
+.page-card-head{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.page-card-head a{
+    color: #2068F3;
+  font-weight: bolder;
+    text-decoration: none;
+
+}

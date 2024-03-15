@@ -1,3 +1,12 @@
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+body{
+    font-family: "Poppins", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+    margin: 0;
+}
 .app-page-login{
     height: 100vh;
     background-color: #efede2;
@@ -11,8 +20,7 @@
     }
     &__card{
         background-color: #ffffff;
-        width: 100%;
-        max-width: 500px;
+        width: 550px;
         padding: 30px;
         border-radius: 20px;
         box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
@@ -58,8 +66,7 @@
 }
 
 .page-card {
-    width: 100%;
-    max-width: 400px;
+    width: 500px !important;
     padding: 40px 20px;
     border-radius: 10px;
     box-shadow: 0 0 10px #eaeaea;
@@ -77,6 +84,13 @@
     flex-direction: column;
     margin-top: 15px;
 }
+.login-container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 .form-group {
     margin-bottom: 15px;
 }
@@ -91,7 +105,7 @@
     font-size: 15px;
     font-weight: 600;
     padding: 3px 10px;
-    margin-top: -12px;
+    margin-top: -15px;
     background-color: #ffffff;
 }
 .spinner {
@@ -100,7 +114,9 @@
     height: 40px;
     margin: 0 auto;
   }
-  
+  .page-card h4{
+    text-align: center;
+  }
   .spinner-inner {
     position: absolute;
     top: 0;
@@ -149,6 +165,7 @@
     color: #ffffff;
     text-decoration: none;
     display: flex;
+    border-radius: 4px;
 }
 .actions a.danger {
     padding: 6px 12px;
@@ -159,32 +176,51 @@
     display: flex;
     cursor: pointer;
 }
-.agents-list h4{
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    justify-content: center;
+
+.agents-list .survey_type{
+    font-family: "Poppins", sans-serif;
+    font-weight: 500;
+    font-style: normal;
     font-size: 16px;
+    display: flex;
+    flex-direction: column;
+    width: 242px;
 }
 .agents-list h4 .form-group{
-    height: 20px;
-    padding: 0;
-    margin: 0!important;
-    width: 120px;
+    font: inherit;
+    letter-spacing: inherit;
+    color: currentColor;
+    padding: 4px 0 5px;
+    border: 0;
+    box-sizing: content-box;
+    background: none;
+    height: 1.4375em;
+    margin: 0;
+    -webkit-tap-highlight-color: transparent;
+    display: block;
+    min-width: 0;
+    -webkit-animation-name: mui-auto-fill-cancel;
+    animation-name: mui-auto-fill-cancel;
+    -webkit-animation-duration: 10ms;
+    animation-duration: 10ms;
+    padding: 16.5px 14px;
+    border: 1px solid rgba(0, 0, 0, 0.23);
+    border-radius: 4px;
+    margin: 10px 0px 0px 0px;
 }
 .agents-list .form-group1{
-    width: 400px;
+    width: 100%;
 }
 .charts-container{
-    width: 600px;
+    width: 100%;
     display: flex;
     gap: 30px;
+    margin-top: 20px;
 }
 .charts-flex {
     display: flex;
     justify-content: space-around;
     align-items: center;
-    margin-bottom: 50px;
 }
 .app-table-component{
     width: fit-content;
@@ -192,11 +228,15 @@
 .app-table-container{
     display: flex;
     justify-content: space-around;
+    padding: 30px 0px;
+    width: 100%;
 }
 .login-btn {
+    font-family: "Poppins", sans-serif;
+    font-weight: 500;
+    font-style: normal;
     padding: 10px;
     text-align: center;
-    font-weight: bold;
     font-size: 15px;
     width: 100%;
     color: #ffffff;
@@ -208,10 +248,130 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    margin-bottom: 20px;
+}
+.page-card-head h2{
+    font-size: 18px;
+    line-height: 28px;
+    font-weight: 600;
+    margin: 0px 0px 0px 0px;
 }
 .page-card-head a{
-    color: #2068F3;
-  font-weight: bolder;
-    text-decoration: none;
+    font-size: 16px;
+    line-height: 26px;
+    font-weight: 600;
+   color: #2068F3;
+   text-decoration: none;
+}
+.chart h2{
+    font-size: 18px;
+    line-height: 28px;
+    font-weight: 600;
+    margin: 0px 0px 10px 0px;
+    text-align: center;
+}
+.chart{
+    width: 50%;
+}
+.jumbotron .list_user{
+    font-size: 30px;
+    line-height: 40px;
+    font-weight: 600;
+    margin: 0px 0px 10px 0px;
+}
+.servey_type .form-group{
+    font: inherit;
+    letter-spacing: inherit;
+    color: currentColor;
+    padding: 4px 0 5px;
+    border: 0;
+    box-sizing: content-box;
+    background: none;
+    height: 1.4375em;
+    margin: 0;
+    -webkit-tap-highlight-color: transparent;
+    display: block;
+    min-width: 0;
+    width: 94%;
+    -webkit-animation-name: mui-auto-fill-cancel;
+    animation-name: mui-auto-fill-cancel;
+    -webkit-animation-duration: 10ms;
+    animation-duration: 10ms;
+    padding: 16.5px 14px;
+    border: 1px solid rgba(0, 0, 0, 0.23);
+    border-radius: 4px;
+    margin: 0px 0px 03px 0px;
+}
+.login_main_form .form-group{
+    margin-bottom: 0;
+}
+.excel_file label{
+    margin-bottom: 10px;
+}
 
+@media (min-width:320px) and (max-width:767px) {
+    .charts-flex{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    .charts-container{
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+    .app-table-container{
+        width: 100%;
+        overflow-x: scroll;
+    }
+    .chart{
+        width: 100%;
+    }
+    .jumbotron .list_user {
+        font-size: 20px;
+        line-height: 30px;
+    }
+    .app-table-component{
+        width: 100%;
+    }
+    .page-card{
+        width: 100% !important;
+        margin: 10px;
+    }
+    .app-page-login__card{
+        margin: 0px 10px;
+    }
+    .servey_type .form-group {
+        width: auto;
+    }
+
+}
+
+@media (min-width:768px) and (max-width:991px) {
+    .app-table-container{
+        width: 100%;
+        overflow-x: scroll;
+    }
+    .chart{
+        width: 100%;
+    }
+    .charts-container{
+        width: 100%;
+        overflow-x: scroll;
+        margin-top: 40px;
+    }
+    .app-table-component{
+        width: 100%;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    }
+}
+@media (min-width:992px) and (max-width:1399px) {
+    .charts-container{
+        width: 100%;
+        overflow-x: scroll;
+    }
+    .app-table-component{
+        width: 100%;
+    }
 }

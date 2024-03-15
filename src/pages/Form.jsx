@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
-import { toast } from 'react-toastify';
+import { toast,ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import TextField from '@mui/material/TextField';
 
 function Form() {
   const [templates, setTemplates] = useState([]);
@@ -11,15 +12,17 @@ function Form() {
   const [selectedTemplate, setSelectedTemplate] = useState("");
   const [templateMessage, setTemplateMessage] = useState("");
   const [fileInputKey, setFileInputKey] = useState(0);
-  const [isFormMounted, setIsFormMounted] = useState(false); // New state variable
+  const [isFormMounted, setIsFormMounted] = useState(false);
   const fileInputRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    setIsFormMounted(true); // Set form mounted when component mounts
+    setIsFormMounted(true);
+
     fetchTemplates();
 
     return () => {
-      setIsFormMounted(false); // Set form unmounted when component unmounts
+      setIsFormMounted(false);
     };
   }, []);
 
@@ -48,62 +51,61 @@ function Form() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     const file = fileInputRef.current.files[0];
-    const fileInputValue = fileInputRef.current.value;
-
+    const isFileUploaded = !!file;
+  
+    const isSurveyTypeSelected = !!selectedTemplate;
+    const isNameNotEmpty = !!name.trim();
+    const isNumberNotEmpty = !!number.trim();
+  
+    const isFormValid = isSurveyTypeSelected && ((isNameNotEmpty && isNumberNotEmpty) || isFileUploaded);
+  
+    if (!isFormValid) {
+      toast.error("Please enter mobile number & Name or upload file");
+      return;
+    }
+  
     const formData = {
       passcode: "7ab97576-6077-47ac-b9e2-e00548fe226d",
       template: selectedTemplate,
       username: name,
       phone: number,
     };
-
+  
     try {
       if (file) {
         const reader = new FileReader();
-        reader.onload = (e) => {
+        reader.onload = async (e) => {
           const data = new Uint8Array(e.target.result);
           const workbook = XLSX.read(data, { type: "array" });
           const sheet = workbook.Sheets[workbook.SheetNames[0]];
           const excelData = XLSX.utils.sheet_to_json(sheet);
-
-          excelData.forEach((row) => {
+  
+          for (const row of excelData) {
             const rowFormData = {
               ...formData,
               username: row.username,
               phone: row.phone,
             };
-            sendFormData(rowFormData);
-          });
-
-          setName("");
-          setNumber("");
-          setSelectedTemplate("");
-          setTemplateMessage("");
-          if (isFormMounted) {
-            document.getElementById("form").reset(); // Reset form if mounted
+            await sendFormData(rowFormData);
           }
-          toast.success("Messages sent successfully!");
+  
+          resetForm();
+          navigate('/success');
         };
         reader.readAsArrayBuffer(file);
       } else {
         await sendFormData(formData);
-        setName("");
-        setNumber("");
-        setSelectedTemplate("");
-        setTemplateMessage("");
-        if (isFormMounted) {
-          document.getElementById("form").reset(); // Reset form if mounted
-        }
-        toast.success("Message sent successfully!");
+        resetForm();
+        navigate('/success');
       }
     } catch (error) {
       console.error("Error submitting form:", error);
       toast.error("Error occurred while sending message");
     }
   };
-
+  
   const sendFormData = async (formData) => {
     try {
       const response = await fetch("https://whatsapp.presentience.in/api/send-message", {
@@ -123,6 +125,16 @@ function Form() {
     }
   };
 
+  const resetForm = () => {
+    setName("");
+    setNumber("");
+    setSelectedTemplate("");
+    setTemplateMessage("");
+    if (isFormMounted) {
+      document.getElementById("form").reset();
+    }
+  };
+
   return (
     <div className="login-container">
       <div className="page-card">
@@ -130,9 +142,8 @@ function Form() {
           <h2>User Details</h2>
           <Link to='/intlist'>View Interactions</Link>
         </div>
-        <form id="form" onSubmit={handleSubmit} encType="multipart/form-data">
-          <div className="form-group">
-            <label htmlFor="template">Survey Type</label>
+        <form className="login_main_form" id="form" onSubmit={handleSubmit} encType="multipart/form-data">
+          <div className="form-group servey_type">
             <select
               className="form-group"
               name="template"
@@ -141,7 +152,7 @@ function Form() {
               value={selectedTemplate}
               onChange={handleTemplateChange}
             >
-              <option value="">Select</option>
+              <option value="">Survey Type</option>
               {templates.map((template) => (
                 <option key={template.name} value={template.name}>
                   {template.name}
@@ -155,27 +166,15 @@ function Form() {
             </div>
           )}
           <div className="form-group">
-            <label htmlFor="name">Name</label>
-            <input
-              type="text"
-              name="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
+            <TextField type="text" name="name" value={name} onChange={(e) => setName(e.target.value)} id="outlined-basic" label="Name" variant="outlined" />
           </div>
           <div className="form-group">
-            <label htmlFor="number">Number</label>
-            <input
-              type="number"
-              name="number"
-              value={number}
-              onChange={(e) => setNumber(e.target.value)}
-            />
+            <TextField type="number" name="number" value={number} onChange={(e) => setNumber(e.target.value)} id="outlined-basic" label="Number" variant="outlined" />
           </div>
           <div className="orwith">
             <span>OR Upload</span>
           </div>
-          <div className="form-group">
+          <div className="form-group excel_file">
             <label htmlFor="fileToUpload">Excel file with Name and Number</label>
             <input
               type="file"
@@ -188,6 +187,7 @@ function Form() {
           <input className="login-btn" type="submit" value="Submit" />
         </form>
       </div>
+      <ToastContainer /> {/* Place this outside the form */}
     </div>
   );
 }

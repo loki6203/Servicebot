@@ -4,6 +4,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { Container, IconButton, Tooltip, Typography } from "@mui/material";
 import { ArrowBack } from "@mui/icons-material";
 import { Chart, registerables } from "chart.js";
+import { Refresh as RefreshIcon } from "@mui/icons-material";
+
 import { Bar } from "react-chartjs-2";
 Chart.register(...registerables);
 
@@ -16,6 +18,7 @@ const InteractionList = () => {
   const [messageStatusData, setMessageStatusData] = useState({ datasets: [] });
   const [buttonClicksData, setButtonClicksData] = useState({ datasets: [] });
   const [templateMessage, setTemplateMessage] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
   console.log(templateMessage);
   const scaleOptions = {
     y: {
@@ -194,7 +197,7 @@ const InteractionList = () => {
 
   const columns = [
     {
-      accessorKey: "username",
+      accessorKey: "username.value",
       header: "Username",
       Cell: ({ row }) => (
         <span className="custom-table-cell-text">
@@ -258,7 +261,12 @@ const InteractionList = () => {
       },
     },
   ];
-
+  const handleRefresh = async () => {
+    setRefreshing(true); // Start the refreshing spinner
+    await fetchData(selectedTemplate);
+    await fetchMessageCounts(selectedTemplate);
+    setRefreshing(false); // Stop the refreshing spinner
+  };
   return (
     <>
       <div className="jumbotron text-center">
@@ -283,6 +291,7 @@ const InteractionList = () => {
           <div className="agents-list">
             <Typography className="survey_type" variant="h6" component="h4" gutterBottom>
               Survey Type:
+              <div className="refresh-flex">
               <select
                 className="form-group"
                 name="template"
@@ -298,6 +307,12 @@ const InteractionList = () => {
                   </option>
                 ))}
               </select>
+              <Tooltip title="Refresh">
+          <IconButton onClick={handleRefresh} disabled={!selectedTemplate || refreshing}>
+            <RefreshIcon />
+          </IconButton>
+        </Tooltip>
+        </div>
             </Typography>
             {templateMessage && (
               <div className="form-group1">

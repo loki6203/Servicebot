@@ -176,7 +176,13 @@ body{
     display: flex;
     cursor: pointer;
 }
-
+.refresh-flex{
+    display: flex;
+    align-items: center;
+}
+.refresh-flex button{
+    color: rgb(38, 38, 177);
+}
 .agents-list .survey_type{
     font-family: "Poppins", sans-serif;
     font-weight: 500;
@@ -185,6 +191,12 @@ body{
     display: flex;
     flex-direction: column;
     width: 242px;
+}
+.app-table-component h3{
+    text-align: center;
+}
+.agents-list h4{
+    display: flex;
 }
 .agents-list h4 .form-group{
     font: inherit;

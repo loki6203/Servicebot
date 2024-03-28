@@ -4,6 +4,7 @@ import * as XLSX from "xlsx";
 import { toast,ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import TextField from '@mui/material/TextField';
+import TopNavBar from "./TopNav";
 
 function Form() {
   const [templates, setTemplates] = useState([]);
@@ -25,22 +26,40 @@ function Form() {
       setIsFormMounted(false);
     };
   }, []);
+const role=localStorage.getItem('role')
+const fetchTemplates = async () => {
+  try {
+    let templatesAPI;
+    const role = localStorage.getItem('role');
+    const Token = localStorage.getItem('Token');
+    const headers = {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${Token}`,
+    };
 
-  const fetchTemplates = async () => {
-    try {
-      const response = await fetch("https://whatsapp.presentience.in/api/template");
-      if (response.ok) {
-        const data = await response.json();
-        if (data.templates && data.templates.length > 0) {
-          setTemplates(data.templates);
-        }
-      } else {
-        console.error("Failed to fetch templates data");
-      }
-    } catch (error) {
-      console.error("Error fetching templates data:", error);
+    if (role === 'admin') {
+      templatesAPI = 'https://whatsapp.presentience.in/api/template';
+    } else if (role === 'user') {
+      templatesAPI = 'https://whatsapp.presentience.in/api/user/templates';
+    } else {
+      console.error('Invalid role:', role);
+      return;
     }
-  };
+
+    const response = await fetch(templatesAPI,{ headers });
+    if (response.ok) {
+      const data = await response.json();
+      if (data.templates && data.templates.length > 0) {
+        setTemplates(data.templates);
+      }
+    } else {
+      console.error('Failed to fetch templates data');
+    }
+  } catch (error) {
+    console.error('Error fetching templates data:', error);
+  }
+};
+
 
   const handleTemplateChange = (e) => {
     const selectedTemplateName = e.target.value;
@@ -136,7 +155,11 @@ function Form() {
   };
 
   return (
+    <>
+      <TopNavBar/>
+    
     <div className="login-container">
+    
       <div className="page-card">
         <div className="page-card-head">
           <h2>User Details</h2>
@@ -189,6 +212,7 @@ function Form() {
       </div>
       <ToastContainer /> {/* Place this outside the form */}
     </div>
+    </>
   );
 }
 

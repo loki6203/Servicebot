@@ -1,64 +1,75 @@
-
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
-body{
+body {
     font-family: "Poppins", sans-serif;
     font-weight: 500;
     font-style: normal;
     margin: 0;
 }
-.app-page-login{
+
+.app-page-login {
     height: 100vh;
     background-color: #efede2;
     background-position: center;
     background-size: cover;
-    &__wrapper{
+
+    &__wrapper {
         display: flex;
         align-items: center;
         justify-content: center;
         height: 100%;
     }
-    &__card{
+
+    &__card {
         background-color: #ffffff;
         width: 550px;
         padding: 30px;
         border-radius: 20px;
         box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
-        h2{
-            margin:0 0 10px 0;
+
+        h2 {
+            margin: 0 0 10px 0;
             font-size: 28px;
             color: #262626;
         }
-        p{
-            margin:0;
+
+        p {
+            margin: 0;
             color: #838383;
         }
     }
-    &__formgroup{
+
+    &__formgroup {
         display: flex;
         flex-direction: column;
     }
-    &__field{
+
+    &__field {
         margin: 10px 0;
     }
-    &__forgotpassword{
+
+    &__forgotpassword {
         display: flex;
         justify-content: flex-end;
         margin-top: 10px;
     }
-    &__button{
+
+    &__button {
         display: flex;
         justify-content: center;
-        margin-top:20px;
-        .MuiButtonBase-root{
+        margin-top: 20px;
+
+        .MuiButtonBase-root {
             font-weight: 600;
-            .MuiSvgIcon-root{
+
+            .MuiSvgIcon-root {
                 margin-right: 5px;
                 font-size: 20px;
             }
         }
     }
-    &__rememberpassswprd{
+
+    &__rememberpassswprd {
         display: flex;
         justify-content: center;
         margin-top: 20px;
@@ -72,6 +83,7 @@ body{
     box-shadow: 0 0 10px #eaeaea;
     background-color: #ffffff;
 }
+
 .login-container {
     width: 100vw;
     height: 100vh;
@@ -79,11 +91,13 @@ body{
     justify-content: center;
     align-items: center;
 }
+
 .form-group {
     display: flex;
     flex-direction: column;
     margin-top: 15px;
 }
+
 .login-container {
     width: 100vw;
     height: 100vh;
@@ -91,33 +105,39 @@ body{
     justify-content: center;
     align-items: center;
 }
+
 .form-group {
     margin-bottom: 15px;
 }
-.orwith{
+
+.orwith {
     width: 100%;
     border-top: 1px solid #777;
     margin: 30px 0 15px 0;
     display: flex;
     justify-content: center;
 }
-.orwith span{
+
+.orwith span {
     font-size: 15px;
     font-weight: 600;
     padding: 3px 10px;
     margin-top: -15px;
     background-color: #ffffff;
 }
+
 .spinner {
     position: relative;
     width: 40px;
     height: 40px;
     margin: 0 auto;
-  }
-  .page-card h4{
+}
+
+.page-card h4 {
     text-align: center;
-  }
-  .spinner-inner {
+}
+
+.spinner-inner {
     position: absolute;
     top: 0;
     left: 0;
@@ -125,21 +145,23 @@ body{
     height: 100%;
     border: 4px solid rgba(0, 0, 0, 0.1);
     border-radius: 50%;
-    border-left-color: #7986cb; 
+    border-left-color: #7986cb;
     animation: spin 1s linear infinite;
-  }
-  
-  @keyframes spin {
-    to {
-      transform: rotate(360deg);
-    }
-  }
-  @media screen and (min-width: 768px){
-.jumbotron {
-    padding-top: 48px;
-    padding-bottom: 48px;
 }
-  }
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .jumbotron {
+        padding-top: 48px;
+        padding-bottom: 48px;
+    }
+}
+
 .jumbotron {
     padding-top: 30px;
     padding-bottom: 30px;
@@ -147,17 +169,21 @@ body{
     color: inherit;
     background-color: #eee;
 }
+
 .text-center {
     text-align: center;
 }
+
 .actions {
     display: flex;
     justify-content: center;
     align-items: center;
 }
-.actions > div {
+
+.actions>div {
     margin-right: 20px;
 }
+
 .actions a {
     padding: 6px 12px;
     background: #2068F3;
@@ -167,6 +193,7 @@ body{
     display: flex;
     border-radius: 4px;
 }
+
 .actions a.danger {
     padding: 6px 12px;
     background: #ff0000;
@@ -176,18 +203,22 @@ body{
     display: flex;
     cursor: pointer;
 }
-.refresh-flex{
+
+.refresh-flex {
     display: flex;
     align-items: center;
 }
-.refresh-flex button{
+
+.refresh-flex button {
     color: rgb(38, 38, 177);
-   
+
 }
-.refresh-flex button svg{
+
+.refresh-flex button svg {
     font-size: 30px;
 }
-.agents-list .survey_type{
+
+.agents-list .survey_type {
     font-family: "Poppins", sans-serif;
     font-weight: 500;
     font-style: normal;
@@ -196,13 +227,16 @@ body{
     flex-direction: column;
     width: 242px;
 }
-.app-table-component h3{
+
+.app-table-component h3 {
     text-align: center;
 }
-.agents-list h4{
+
+.agents-list h4 {
     display: flex;
 }
-.agents-list h4 .form-group{
+
+.agents-list h4 .form-group {
     font: inherit;
     letter-spacing: inherit;
     color: currentColor;
@@ -224,29 +258,35 @@ body{
     border-radius: 4px;
     margin: 10px 0px 0px 0px;
 }
-.agents-list .form-group1{
+
+.agents-list .form-group1 {
     width: 100%;
 }
-.charts-container{
+
+.charts-container {
     width: 100%;
     display: flex;
     gap: 30px;
     margin-top: 20px;
 }
+
 .charts-flex {
     display: flex;
     justify-content: space-around;
     align-items: center;
 }
-.app-table-component{
+
+.app-table-component {
     width: fit-content;
 }
-.app-table-container{
+
+.app-table-container {
     display: flex;
     justify-content: space-around;
     padding: 30px 0px;
     width: 100%;
 }
+
 .login-btn {
     font-family: "Poppins", sans-serif;
     font-weight: 500;
@@ -260,42 +300,117 @@ body{
     margin-top: 30px;
     border: 1px solid #2068F3;
 }
-.page-card-head{
+
+.page-card-head {
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin-bottom: 20px;
 }
-.page-card-head h2{
+
+.page-card-head h2 {
     font-size: 18px;
     line-height: 28px;
     font-weight: 600;
     margin: 0px 0px 0px 0px;
 }
-.page-card-head a{
+
+.page-card-head a {
     font-size: 16px;
     line-height: 26px;
     font-weight: 600;
-   color: #2068F3;
-   text-decoration: none;
+    color: #2068F3;
+    text-decoration: none;
 }
-.chart h2{
+
+.add-user-cont .butto {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+}
+
+.add-user-cont .butto button {
+    padding: 5px 12px;
+    background: #2068F3;
+    border: 1px solid #2068F3;
+    color: #ffffff;
+    text-decoration: none;
+    display: flex;
+    border-radius: 4px;
+    font-size: 16px;
+    text-transform: lowercase;
+
+}
+
+.active-tab {
+    color: rgb(255, 255, 255) !important;
+    background-color: #062c77 !important;
+    border-radius: 6px !important;
+    padding: 5px 12px !important;
+}
+
+.assign-but {
+    position: sticky !important;
+    bottom: 0 !important;
+    width: 100% !important;
+}
+
+.more {
+    color: blue;
+    /* Example style */
+    font-weight: bold;
+    /* Example style */
+    /* Add any other styles you want */
+}
+
+.modal-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 400px;
+    max-width: 90%;
+}
+
+.modal-container {}
+
+.modal-container h6 {
+    margin-bottom: 16px;
+}
+
+.modal-container input {
+    margin-bottom: 16px;
+}
+
+.modal-container button {
+    margin-top: 16px;
+}
+
+.chart h2 {
     font-size: 18px;
     line-height: 28px;
     font-weight: 600;
     margin: 0px 0px 10px 0px;
     text-align: center;
 }
-.chart{
+
+.chart {
     width: 50%;
 }
-.jumbotron .list_user{
+
+.jumbotron .list_user {
     font-size: 30px;
     line-height: 40px;
     font-weight: 600;
     margin: 0px 0px 10px 0px;
 }
-.servey_type .form-group{
+
+.servey_type .form-group {
     font: inherit;
     letter-spacing: inherit;
     color: currentColor;
@@ -318,46 +433,56 @@ body{
     border-radius: 4px;
     margin: 0px 0px 03px 0px;
 }
-.login_main_form .form-group{
+
+.login_main_form .form-group {
     margin-bottom: 0;
 }
-.excel_file label{
+
+.excel_file label {
     margin-bottom: 10px;
 }
 
 @media (min-width:320px) and (max-width:767px) {
-    .charts-flex{
+    .charts-flex {
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
     }
-    .charts-container{
+
+    .charts-container {
         display: flex;
         flex-direction: column;
         width: 100%;
     }
-    .app-table-container{
+
+    .app-table-container {
         width: 100%;
         overflow-x: scroll;
     }
-    .chart{
+
+    .chart {
         width: 100%;
     }
+
     .jumbotron .list_user {
         font-size: 20px;
         line-height: 30px;
     }
-    .app-table-component{
+
+    .app-table-component {
         width: 100%;
     }
-    .page-card{
+
+    .page-card {
         width: 100% !important;
         margin: 10px;
     }
-    .app-page-login__card{
+
+    .app-page-login__card {
         margin: 0px 10px;
     }
+
     .servey_type .form-group {
         width: auto;
     }
@@ -365,29 +490,103 @@ body{
 }
 
 @media (min-width:768px) and (max-width:991px) {
-    .app-table-container{
+    .app-table-container {
         width: 100%;
         overflow-x: scroll;
     }
-    .chart{
+
+    .chart {
         width: 100%;
     }
-    .charts-container{
+
+    .charts-container {
         width: 100%;
         overflow-x: scroll;
         margin-top: 40px;
     }
-    .app-table-component{
+
+    .app-table-component {
         width: 100%;
-        box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
     }
 }
+
 @media (min-width:992px) and (max-width:1399px) {
-    .charts-container{
+    .charts-container {
         width: 100%;
         overflow-x: scroll;
     }
-    .app-table-component{
+
+    .app-table-component {
         width: 100%;
     }
+}
+
+//start
+.add-user-cont .butto h1 {
+    font-size: 18px;
+    line-height: 25px;
+    margin: 20px 0px 20px 0px;
+    font-weight: 700;
+    color: #000;
+
+}
+
+.add-user-cont .butto .MuiSvgIcon-root {
+    font-size: 18px;
+
+}
+
+.user_text {
+    font-size: 16px !important;
+    line-height: 25px !important;
+    margin: 0px 0px 0px 0px !important;
+    font-weight: 500 !important;
+    color: #ffffff !important;
+
+}
+
+.css-b6h2xg-MuiButtonBase-root-MuiButton-root {
+    color: #fff !important;
+    margin-left: 40px !important;
+    font-weight: 500 !important;
+    font-size: 16px !important;
+    line-height: 25px !important;
+    text-transform: capitalize !important;
+
+}
+
+.css-1h9z7r5-MuiButtonBase-root-MuiTab-root {
+    color: #fff !important;
+    font-weight: 500 !important;
+    font-size: 16px !important;
+    line-height: 25px !important;
+    text-transform: capitalize !important;
+    min-height: 0px !important;
+}
+
+.css-1h9z7r5-MuiButtonBase-root-MuiTab-root:not(:first-child) {
+    margin-left: 40px !important;
+
+}
+
+.css-sghohy-MuiButtonBase-root-MuiButton-root {
+    font-size: 16px !important;
+    line-height: 25px !important;
+    margin: 0px 0px 0px 0px !important;
+    font-weight: 500 !important;
+    color: #ffffff !important;
+    background-color: #2068F3 !important;
+    text-transform: capitalize !important;
+}
+
+.css-hyum1k-MuiToolbar-root {
+    min-height: 0px !important;
+    padding: 15px 24px !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+.css-1lrpa5t-MuiTabs-root {
+    min-height: 0px !important;
 }

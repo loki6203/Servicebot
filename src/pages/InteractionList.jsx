@@ -7,6 +7,7 @@ import { Chart, registerables } from "chart.js";
 import { Refresh as RefreshIcon } from "@mui/icons-material";
 
 import { Bar } from "react-chartjs-2";
+import TopNavBar from "./TopNav";
 Chart.register(...registerables);
 
 const InteractionList = () => {
@@ -34,25 +35,41 @@ const InteractionList = () => {
     fetchTemplates();
   }, []);
 
+  
   const fetchTemplates = async () => {
     try {
-      const response = await fetch(
-        "https://whatsapp.presentience.in/api/template"
-      );
+      let templatesAPI;
+      const role = localStorage.getItem('role');
+      const Token = localStorage.getItem('Token');
+      const headers = {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${Token}`,
+      };
+  
+      if (role === 'admin') {
+        templatesAPI = 'https://whatsapp.presentience.in/api/template';
+      } else if (role === 'user') {
+        templatesAPI = 'https://whatsapp.presentience.in/api/user/templates';
+      } else {
+        console.error('Invalid role:', role);
+        return;
+      }
+  
+      const response = await fetch(templatesAPI, { headers });
       if (response.ok) {
         const data = await response.json();
         if (data.templates && data.templates.length > 0) {
           setTemplates(data.templates);
-          setIsLoading(false); // Stop the loading spinner after fetching templates
+          setIsLoading(false); 
         }
       } else {
-        console.error("Failed to fetch templates data");
+        console.error('Failed to fetch templates data');
       }
     } catch (error) {
-      console.error("Error fetching templates data:", error);
+      console.error('Error fetching templates data:', error);
     }
   };
-
+  
   const handleTemplateChange = async (e) => {
     const selectedTemplateName = e.target.value;
     setSelectedTemplate(selectedTemplateName);
@@ -269,6 +286,7 @@ const InteractionList = () => {
   };
   return (
     <>
+    <TopNavBar/>
       <div className="jumbotron text-center">
         <Container>
           <h1 className="list_user">
@@ -276,7 +294,7 @@ const InteractionList = () => {
           </h1>
           <div className="actions">
             <div className="">
-              <Link to="/form">New User</Link>
+              <Link to="/form">New Survey</Link>
             </div>
             <div className="">
               <a className="danger" onClick={handleLogout}>

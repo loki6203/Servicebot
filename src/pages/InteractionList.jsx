@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { MaterialReactTable } from "material-react-table";
 import { Link, useNavigate } from "react-router-dom";
-import { Container, IconButton, Tooltip, Typography } from "@mui/material";
+import { Box, Button, Container, IconButton, Tooltip, Typography } from "@mui/material";
 import { ArrowBack } from "@mui/icons-material";
 import { Chart, registerables } from "chart.js";
 import { Refresh as RefreshIcon } from "@mui/icons-material";
-
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
 import { Bar } from "react-chartjs-2";
 import TopNavBar from "./TopNav";
+import dayjs from "dayjs";
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import { mkConfig, generateCsv, download } from 'export-to-csv';
+
 Chart.register(...registerables);
 
 const InteractionList = () => {
@@ -20,6 +26,10 @@ const InteractionList = () => {
   const [buttonClicksData, setButtonClicksData] = useState({ datasets: [] });
   const [templateMessage, setTemplateMessage] = useState("");
   const [refreshing, setRefreshing] = useState(false);
+  const [fromDate, setFromDate] = useState(null);
+  const [toDate, setToDate] = useState(null);
+  const [isTemplateSelected, setIsTemplateSelected] = useState(false); 
+  const [triggerRefresh, setTriggerRefresh] = React.useState(0);
   console.log(templateMessage);
   const scaleOptions = {
     y: {
@@ -77,7 +87,9 @@ const InteractionList = () => {
       (template) => template.name === selectedTemplateName
     );
     setTemplateMessage(selectedTemplate?.message || "");
-    setIsLoading(true); // Start the loading spinner when survey type is selected
+    setIsLoading(true); 
+
+
     await fetchData(selectedTemplateName);
     await fetchMessageCounts(selectedTemplateName);
   };
@@ -87,6 +99,8 @@ const InteractionList = () => {
       const formData = {
         passcode: "7ab97576-6077-47ac-b9e2-e00548fe226d",
         template: selectedTemplateName,
+        fromDate: fromDate ? dayjs(fromDate).format('YYYY-MM-DD'): null,
+        toDate: toDate ?dayjs(toDate).format('YYYY-MM-DD') : null,
       };
 
       const response = await fetch(
@@ -112,12 +126,14 @@ const InteractionList = () => {
       setIsLoading(false); // Stop the loading spinner after fetching data
     }
   };
-
+ 
   const fetchMessageCounts = async (selectedTemplateName) => {
     try {
       const formData = {
         passcode: "7ab97576-6077-47ac-b9e2-e00548fe226d",
         template: selectedTemplateName,
+        fromDate: fromDate ? dayjs(fromDate).format('YYYY-MM-DD'): null,
+        toDate: toDate ?dayjs(toDate).format('YYYY-MM-DD') : null,
       };
 
       const response = await fetch(
@@ -142,6 +158,12 @@ const InteractionList = () => {
       console.error("Error fetching message counts data:", error);
     }
   };
+  useEffect(() => {
+    if (selectedTemplate) {
+      fetchData(selectedTemplate);
+      fetchMessageCounts(selectedTemplate);
+    }
+  }, [fromDate, toDate]);
 
   const prepareChartData = (messageCounts) => {
     const messageStatusDataColors = [
@@ -211,7 +233,41 @@ const InteractionList = () => {
       <div className="spinner-inner"></div>
     </div>
   );
+  const csvConfig = mkConfig({
+    fieldSeparator: ',',
+    decimalSeparator: '.',
+    useKeysAsHeaders: true,
+  });
 
+  const exportCsv = async (rows, exportAll) => {
+    const rowData = exportAll ? apiData.results : rows.map(row => {
+      const newRow = { ...row.original };
+      for (const key in newRow) {
+        if (typeof newRow[key] === 'object' && newRow[key] !== null) {
+          Object.entries(newRow[key]).forEach(([subKey, value]) => {
+            newRow[`${key}_${subKey}`] = value;
+          });
+          delete newRow[key];
+        }
+      }
+      return newRow;
+    });
+  
+    if (rowData.length === 0) {
+      console.error('No data to export.');
+      return;
+    }
+  
+    const csvConfig = mkConfig({
+      fieldSeparator: ',',
+      decimalSeparator: '.',
+      useKeysAsHeaders: true,
+    });
+  
+    const csv = generateCsv(csvConfig)(rowData);
+    await download(csvConfig)(csv);
+  };
+  
   const columns = [
     {
       accessorKey: "username.value",
@@ -338,7 +394,72 @@ const InteractionList = () => {
               </div>
             )}
           </div>
-          <div className="charts-container">
+          
+          
+        </Container>
+      </div>
+      <Container>
+      {selectedTemplate && (
+      <div className="dates-style">
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <label style={{ marginRight: '10px', fontWeight: 'bolder' }}>From Date</label>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <MobileDatePicker
+              className="custom-input"
+              value={fromDate ? dayjs(fromDate) : null}
+              onChange={(newDate) => setFromDate(newDate)}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <IconButton onClick={params.onClickToggle} size="large" edge="start">
+                          <CalendarTodayIcon />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              )}
+              format="DD/MM/YYYY"
+            />
+          </LocalizationProvider>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <label style={{ marginRight: '10px', fontWeight: 'bolder' }}>To Date</label>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <MobileDatePicker
+              className="custom-input"
+              value={toDate ? dayjs(toDate) : null}
+              onChange={(newDate) => setToDate(newDate)}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <IconButton onClick={params.onClickToggle} size="large" edge="start">
+                          <CalendarTodayIcon />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              )}
+              format="DD/MM/YYYY"
+            />
+          </LocalizationProvider>
+        </div>
+     
+   
+      </div>
+      )}
+      </Container>
+      <Container>
+      {selectedTemplate && (
+       <div className="box" >
+      <div className="charts-container">
             {messageStatusData.datasets &&
               messageStatusData.datasets.length > 0 && (
                 <div className="chart">
@@ -360,9 +481,10 @@ const InteractionList = () => {
                 </div>
               )}
           </div>
-        </Container>
-      </div>
-
+       
+          </div>
+      )}
+          </Container>
       <div className="app-table-container">
         <Container>
           <div className="app-table-component">
@@ -375,11 +497,40 @@ const InteractionList = () => {
             ) : null}
 
             {!isLoading && selectedTemplate && (
-              <MaterialReactTable columns={columns} data={apiData || []} />
+              <MaterialReactTable columns={columns} data={apiData || []}
+              renderTopToolbarCustomActions={({ table }) => (
+                <Box
+                  sx={{
+                    display: 'flex',
+                    gap: '16px',
+                    padding: '8px',
+                    flexWrap: 'wrap',
+                  }}
+                >
+                  <Button
+                    disabled={table.getPrePaginationRowModel().rows.length === 0}
+                    onClick={() => exportCsv(table.getPrePaginationRowModel().rows, false)}
+                    startIcon={<FileDownloadIcon />}
+                    variant="outlined"
+                  >
+                    Export All Rows (Excel)
+                  </Button>
+                  {/* <Button
+                    disabled={table.getPrePaginationRowModel().rows.length === 0}
+                    onClick={() => handleExportRows(table.getPrePaginationRowModel().rows, false)}
+                    startIcon={<FileDownloadIcon />}
+                    variant="outlined"
+                  >
+                    Export All Rows (PDF)
+                  </Button> */}
+                
+                </Box>
+              )} />
             )}
           </div>
         </Container>
       </div>
+  
     </>
   );
 };

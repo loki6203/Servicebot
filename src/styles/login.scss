@@ -262,12 +262,26 @@ body {
 .agents-list .form-group1 {
     width: 100%;
 }
-
+.box {
+    border: 1px solid #ccc; /* Border color */
+    border-radius: 5px; /* Rounded corners */
+    padding: 20px; /* Padding around the content */
+    margin-bottom: 20px; /* Spacing between boxes */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Shadow effect */
+  }
+  .dates-style{
+    display: flex;
+    margin-bottom: 10px;
+    gap: 10px;
+ 
+    justify-content: end;
+  }
 .charts-container {
     width: 100%;
     display: flex;
     gap: 30px;
     margin-top: 20px;
+    
 }
 
 .charts-flex {

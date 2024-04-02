@@ -145,8 +145,8 @@ const InteractionList = () => {
       const formData = {
         passcode: "7ab97576-6077-47ac-b9e2-e00548fe226d",
         template: selectedTemplateName,
-        fromDate: fromDate ? dayjs(fromDate).format('YYYY-MM-DDTHH:mm:ss') : null, 
-        toDate: toDate ? dayjs(toDate).format('YYYY-MM-DDTHH:mm:ss') : null, 
+        fromDate: fromDate ? dayjs(fromDate).toISOString() : null, 
+        toDate: toDate ? dayjs(toDate).toISOString() : null,
       };
 
       const response = await fetch(
@@ -162,6 +162,7 @@ const InteractionList = () => {
 
       if (response.ok) {
         const responseData = await response.json();
+
         setMessageCounts(responseData.messageCounts);
         prepareChartData(responseData.messageCounts);
       } else {
@@ -187,7 +188,7 @@ const InteractionList = () => {
     ];
 
     const messageStatusData = {
-      labels: ["Accepted", "Sent", "Delivered", "Read"],
+      labels: ["Accepted", "Sent", "Read"],
       datasets: [
         {
           label: "Message Status",
@@ -197,7 +198,6 @@ const InteractionList = () => {
           data: [
             messageCounts.accepted || 0,
             messageCounts.sent || 0,
-            messageCounts.delivered || 0,
             messageCounts.read || 0,
           ],
         },

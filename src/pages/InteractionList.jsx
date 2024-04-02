@@ -14,17 +14,20 @@ import dayjs from "dayjs";
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import { mkConfig, generateCsv, download } from 'export-to-csv';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 
-Chart.register(...registerables);
+Chart.register(...registerables, ChartDataLabels);
 
 const InteractionList = () => {
   const [apiData, setApiData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [templates, setTemplates] = useState([]);
   const [selectedTemplate, setSelectedTemplate] = useState("");
+  const[total,setTotal]=useState('')
   const [messageCounts, setMessageCounts] = useState({});
   const [messageStatusData, setMessageStatusData] = useState({ datasets: [] });
   const [buttonClicksData, setButtonClicksData] = useState({ datasets: [] });
+  const [chartOptions, setChartOptions] = useState({});
   const [templateMessage, setTemplateMessage] = useState("");
   const [refreshing, setRefreshing] = useState(false);
   const [fromDate, setFromDate] = useState(null);
@@ -206,7 +209,13 @@ const InteractionList = () => {
 
     setMessageStatusData(messageStatusData);
 
-    const buttonClicksDataColors = [
+  
+    const totalButtonResponses = Object.values(messageCounts.buttons || {}).reduce((acc, currentValue) => acc + currentValue, 0);
+console.log(totalButtonResponses)
+setTotal(totalButtonResponses)
+    const labels = Object.keys(messageCounts.buttons || []);
+    const data = Object.values(messageCounts.buttons || {});
+    const backgroundColors = [
       "rgba(255,99,132,0.6)",
       "rgba(54, 162, 235, 0.6)",
       "rgba(255, 206, 86, 0.6)",
@@ -214,29 +223,72 @@ const InteractionList = () => {
       "rgba(153, 102, 255, 0.6)",
       "rgba(255, 159, 64, 0.6)",
       "rgba(255, 99, 132, 0.6)",
-    ];
-
+    ].slice(0, labels.length); 
+    const percentages = data.map(count => {
+      if (totalButtonResponses > 0) {
+        return ((count / totalButtonResponses) * 100).toFixed(2);
+      }
+      return 0; 
+    });
+      
+    
     const buttonClicksData = {
-      labels: Object.keys(messageCounts.buttons || []),
+      labels,
       datasets: [
         {
-          label: "Survey Replies",
-          backgroundColor: buttonClicksDataColors,
-          borderColor: "rgba(255,99,132,1)",
-          borderWidth: 1,
-          hoverBackgroundColor: "rgba(255,99,132,0.8)",
-          hoverBorderColor: "rgba(255,99,132,1)",
-          data: Object.values(messageCounts.buttons || []),
+          backgroundColor: backgroundColors,
+          data,
+     
+          datalabels: {
+            anchor: 'center',
+            align: 'center',
+            formatter: (value, ctx) => {
+              return `${percentages[ctx.dataIndex]}%`;
+            },
+            color: '#444',
+          },
         },
       ],
     };
-
+  
+    const chartOptions = {
+      scales: {
+        y: {
+          beginAtZero: true,
+        },
+      },
+      plugins: {
+        legend: {
+          display: false 
+        },
+        datalabels: {
+          color: '#444',
+          anchor: 'end',
+          align: 'top',
+          formatter: (value, ctx) => {
+            // Check if percentages[ctx.dataIndex] is a valid number
+            if (!isNaN(percentages[ctx.dataIndex]) && percentages[ctx.dataIndex] !== undefined) {
+              const labelPercentage = percentages[ctx.dataIndex];
+              return `${labelPercentage}%`;
+            }
+            return ''; // Return an empty string if not a valid number
+          },        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              const labelPercentage = percentages[context.dataIndex];
+              return `${context.label}: (${labelPercentage}%)`;
+            },
+          },
+        },
+      },
+    };
+    
     setButtonClicksData(buttonClicksData);
+    setChartOptions(chartOptions);
   };
-
   const handleLogout = () => {
-    // Perform logout actions here, such as clearing user session
-    // For now, let's just redirect to the logout page
+   
     localStorage.clear();
     navigate("/");
   };
@@ -502,11 +554,9 @@ const InteractionList = () => {
             {buttonClicksData.datasets &&
               buttonClicksData.datasets.length > 0 && (
                 <div className="chart">
-                  <h2>Survey Report Replies</h2>
-                  <Bar
-                    data={buttonClicksData}
-                    options={{ scales: scaleOptions }}
-                  />
+                  <h2>Total Survey Replies: {total}</h2>
+                  <Bar data={buttonClicksData} options={chartOptions} />
+
                 </div>
               )}
           </div>

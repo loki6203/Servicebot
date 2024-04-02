@@ -7,7 +7,7 @@ import { Chart, registerables } from "chart.js";
 import { Refresh as RefreshIcon } from "@mui/icons-material";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
+import { MobileDateTimePicker } from '@mui/x-date-pickers/MobileDateTimePicker';
 import { Bar } from "react-chartjs-2";
 import TopNavBar from "./TopNav";
 import dayjs from "dayjs";
@@ -100,8 +100,8 @@ const InteractionList = () => {
       const formData = {
         passcode: "7ab97576-6077-47ac-b9e2-e00548fe226d",
         template: selectedTemplateName,
-        fromDate: fromDate ? dayjs(fromDate).format('YYYY-MM-DD'): null,
-        toDate: toDate ?dayjs(toDate).format('YYYY-MM-DD') : null,
+        fromDate: fromDate ? dayjs(fromDate).toISOString() : null, 
+        toDate: toDate ? dayjs(toDate).toISOString() : null,
       };
 
       const response = await fetch(
@@ -117,10 +117,22 @@ const InteractionList = () => {
 
       if (response.ok) {
         const responseData = await response.json();
-        setApiData(responseData.messages);
+        
+        if (fromDate && toDate) {
+          const filteredMessages = responseData.messages.filter((message) => {
+            const statusUpdateTime = new Date(message.createdAt).getTime();
+            const fromTime = new Date(fromDate).getTime();
+            const toTime = new Date(toDate).getTime();
+            return statusUpdateTime >= fromTime && statusUpdateTime <= toTime;
+          });
+          setApiData(filteredMessages);
+        } else {
+          setApiData(responseData.messages); 
+        }
       } else {
         console.error("Failed to fetch interaction data");
       }
+      
     } catch (error) {
       console.error("Error fetching interaction data:", error);
     } finally {
@@ -133,8 +145,8 @@ const InteractionList = () => {
       const formData = {
         passcode: "7ab97576-6077-47ac-b9e2-e00548fe226d",
         template: selectedTemplateName,
-        fromDate: fromDate ? dayjs(fromDate).format('YYYY-MM-DD'): null,
-        toDate: toDate ?dayjs(toDate).format('YYYY-MM-DD') : null,
+        fromDate: fromDate ? dayjs(fromDate).format('YYYY-MM-DDTHH:mm:ss') : null, 
+        toDate: toDate ? dayjs(toDate).format('YYYY-MM-DDTHH:mm:ss') : null, 
       };
 
       const response = await fetch(
@@ -312,34 +324,50 @@ const InteractionList = () => {
       ),
     },
     {
-      accessorKey: "statusupdate",
-      header: "Status Update",
+      accessorKey: "createdAt",
+      header: "Created at",
       Cell: ({ renderedCellValue }) => {
-        // Parse the date string
+        
         const date = new Date(renderedCellValue);
-        // Format the date as desired (e.g., YYYY-MM-DD HH:MM:SS)
-        const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1)
-          .toString()
-          .padStart(2, "0")}-${date
-          .getDate()
-          .toString()
-          .padStart(2, "0")} ${date
-          .getHours()
-          .toString()
-          .padStart(2, "0")}:${date
-          .getMinutes()
-          .toString()
-          .padStart(2, "0")}:${date.getSeconds().toString().padStart(2, "0")}`;
-        // Render the formatted date
+       
+        const formattedDate = date.toLocaleString(undefined, {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+        });
+        
         return <span className="custom-table-cell-text">{formattedDate}</span>;
       },
     },
+   {
+  accessorKey: "statusupdate",
+  header: "Status Update",
+  Cell: ({ renderedCellValue }) => {
+    // Parse the date string
+    const date = new Date(renderedCellValue);
+    // Use toLocaleString to format the date
+    const formattedDate = date.toLocaleString(undefined, {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    });
+    // Render the formatted date
+    return <span className="custom-table-cell-text">{formattedDate}</span>;
+  },
+}
+
   ];
   const handleRefresh = async () => {
-    setRefreshing(true); // Start the refreshing spinner
+    setRefreshing(true); 
     await fetchData(selectedTemplate);
     await fetchMessageCounts(selectedTemplate);
-    setRefreshing(false); // Stop the refreshing spinner
+    setRefreshing(false); 
   };
   return (
     <>
@@ -405,10 +433,10 @@ const InteractionList = () => {
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <label style={{ marginRight: '10px', fontWeight: 'bolder' }}>From Date</label>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <MobileDatePicker
+            <MobileDateTimePicker
               className="custom-input"
               value={fromDate ? dayjs(fromDate) : null}
-              onChange={(newDate) => setFromDate(newDate)}
+              onChange={(newDate) => setFromDate(newDate ? newDate.toISOString() : null)}
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -423,17 +451,17 @@ const InteractionList = () => {
                   }}
                 />
               )}
-              format="DD/MM/YYYY"
-            />
+              inputFormat="YYYY-MM-DDTHH:mm:ss.SSS"
+              />
           </LocalizationProvider>
         </div>
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <label style={{ marginRight: '10px', fontWeight: 'bolder' }}>To Date</label>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <MobileDatePicker
+            <MobileDateTimePicker
               className="custom-input"
               value={toDate ? dayjs(toDate) : null}
-              onChange={(newDate) => setToDate(newDate)}
+              onChange={(newDate) => setToDate(newDate ? newDate.toISOString() : null)}
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -448,7 +476,7 @@ const InteractionList = () => {
                   }}
                 />
               )}
-              format="DD/MM/YYYY"
+              inputFormat="YYYY-MM-DDTHH:mm:ss.SSS"
             />
           </LocalizationProvider>
         </div>

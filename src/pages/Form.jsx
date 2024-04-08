@@ -127,12 +127,14 @@ function Form() {
               ...formData,
               username: row.username || row[Object.keys(row)[0]],
               phone: row.phone || row[Object.keys(row)[1]],
+              booth_no:row.booth_no || row[Object.keys(row)[2]],
+              mandal_name:row.mandal_name || row[Object.keys(row)[3]]
             };
-            await sendFormData(rowFormData); // Assuming sendFormData can handle individual row data
+            await sendFormData(rowFormData); 
           }
-          resolve(); // Resolve the promise after processing all rows
+          resolve(); 
         } catch (err) {
-          reject(err); // Reject the promise on processing error
+          reject(err); 
         }
       };
       reader.onerror = () => {

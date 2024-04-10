@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react"
 import { MaterialReactTable } from "material-react-table"
 import { Link, useNavigate } from "react-router-dom"
-import { Box, Button, Container, IconButton, InputAdornment, TextField, Tooltip, Typography } from "@mui/material"
+import { Autocomplete, Box, Button, Container, IconButton, InputAdornment, MenuItem, TextField, Tooltip, Typography } from "@mui/material"
 import { ArrowBack } from "@mui/icons-material"
 import { Chart, registerables } from "chart.js"
 import { Refresh as RefreshIcon } from "@mui/icons-material"
@@ -22,6 +22,7 @@ const InteractionList = () => {
   const [apiData, setApiData] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [templates, setTemplates] = useState([])
+  const [mandals, setMandals] = useState([])
   const [selectedTemplate, setSelectedTemplate] = useState("")
   const [total, setTotal] = useState('')
   const [messageCounts, setMessageCounts] = useState({})
@@ -35,6 +36,7 @@ const InteractionList = () => {
   const [isTemplateSelected, setIsTemplateSelected] = useState(false)
   const [triggerRefresh, setTriggerRefresh] = React.useState(0)
   const [boothFilter, setBoothFilter] = useState('')
+  const [mandalFilter, setMandalFilter] = useState('')
   console.log(templateMessage)
   const scaleOptions = {
     y: {
@@ -48,8 +50,11 @@ const InteractionList = () => {
 
   useEffect(() => {
     fetchTemplates()
-  }, [])
 
+  }, [])
+  const handleChange = (event) => {
+    setMandalFilter(event.target.value)
+  }
 
   const fetchTemplates = async () => {
     try {
@@ -84,21 +89,59 @@ const InteractionList = () => {
       console.error('Error fetching templates data:', error)
     }
   }
+  useEffect(() => {
+    const fetchMandals = async () => {
+      try {
+        if (!selectedTemplate || !templates) {
+          return
+        }
 
-  const handleTemplateChange = async (e) => {
-    const selectedTemplateName = e.target.value
-    setSelectedTemplate(selectedTemplateName)
-    const selectedTemplate = templates.find(
-      (template) => template.name === selectedTemplateName
-    )
-    setTemplateMessage(selectedTemplate?.message || "")
-    setIsLoading(true)
+        const selectedTemplateObj = templates.find(template => template.name === selectedTemplate)
+        if (!selectedTemplateObj) {
+          console.error('Selected template not found')
+          return
+        }
+
+        const templateId = selectedTemplateObj._id
+
+        const Token = localStorage.getItem('Token')
+        const headers = {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${Token}`,
+        }
+
+        const response = await fetch(`https://whatsapp.presentience.in/api/mandal/${templateId}`, { headers })
+        if (response.ok) {
+          const data = await response.json()
+          if (data) {
+            console.log(data.mandal)
+            setMandals(data?.mandal)
+            setIsLoading(false)
+          }
+        } else {
+          console.error('Failed to fetch templates data')
+        }
+      } catch (error) {
+        console.error('Error fetching templates data:', error)
+      }
+    }
+
+    if (selectedTemplate) {
+      fetchMandals()
+    }
+  }, [selectedTemplate, templates])
 
 
-    await fetchData(selectedTemplateName)
-    await fetchMessageCounts(selectedTemplateName)
-  }
 
+  const handleTemplateChange = async (newValue) => {
+    setSelectedTemplate(newValue);
+    const selectedTemplate = templates.find(template => template.name === newValue);
+    setTemplateMessage(selectedTemplate?.message || "");
+    setIsLoading(true);
+    
+    await fetchData(newValue);
+    await fetchMessageCounts(newValue);
+  };
   const fetchData = async (selectedTemplateName) => {
     try {
       const formData = {
@@ -106,6 +149,8 @@ const InteractionList = () => {
         template: selectedTemplateName,
         fromDate: fromDate ? dayjs(fromDate).toISOString() : null,
         toDate: toDate ? dayjs(toDate).toISOString() : null,
+        ...(boothFilter && { booth_no: boothFilter }), 
+        ...(mandalFilter && { mandal_name: mandalFilter }), 
       }
 
       const response = await fetch(
@@ -151,6 +196,8 @@ const InteractionList = () => {
         template: selectedTemplateName,
         fromDate: fromDate ? dayjs(fromDate).toISOString() : null,
         toDate: toDate ? dayjs(toDate).toISOString() : null,
+        ...(boothFilter && { booth_no: boothFilter }), 
+        ...(mandalFilter && { mandal_name: mandalFilter }),
       }
 
       const response = await fetch(
@@ -181,7 +228,7 @@ const InteractionList = () => {
       fetchData(selectedTemplate)
       fetchMessageCounts(selectedTemplate)
     }
-  }, [fromDate, toDate])
+  }, [fromDate, toDate,boothFilter,mandalFilter])
 
   const prepareChartData = (messageCounts) => {
     const messageStatusDataColors = [
@@ -462,43 +509,42 @@ const InteractionList = () => {
         </Container>
       </div>
       <div className="charts-flex">
-        <Container>
-          <div className="agents-list">
-            <Typography className="survey_type" variant="h6" component="h4" gutterBottom>
-              Survey Type:
-              <div className="refresh-flex">
-                <select
-                  className="form-group"
-                  name="template"
-                  id="template"
-                  required
-                  value={selectedTemplate}
-                  onChange={handleTemplateChange}
-                >
-                  <option value="">Select Survey Type</option>
-                  {templates.map((template) => (
-                    <option key={template.name} value={template.name}>
-                      {template.name}
-                    </option>
-                  ))}
-                </select>
-                <Tooltip title="Refresh">
-                  <IconButton onClick={handleRefresh} disabled={!selectedTemplate || refreshing}>
-                    <RefreshIcon />
-                  </IconButton>
-                </Tooltip>
-              </div>
-            </Typography>
-            {templateMessage && (
-              <div className="form-group1">
-                <p>{templateMessage}</p>
-              </div>
+  <Container>
+    <div className="agents-list">
+      <Typography className="survey_type" variant="h6" component="h4" gutterBottom>
+        <div className="refresh-flex">
+          <Autocomplete
+            value={selectedTemplate || ''}
+            onChange={(event, newValue) => {
+              handleTemplateChange(newValue);
+            }}
+            options={templates.map((template) => template.name)}
+            renderInput={(params) => (
+              <TextField
+              style={{width:'250px'}}
+                {...params}
+                label="Select Survey Type"
+                variant="outlined"
+                required
+                fullWidth
+              />
             )}
-          </div>
-
-
-        </Container>
-      </div>
+          />
+          <Tooltip title="Refresh">
+            <IconButton onClick={handleRefresh} disabled={!selectedTemplate || refreshing}>
+              <RefreshIcon />
+            </IconButton>
+          </Tooltip>
+        </div>
+      </Typography>
+      {templateMessage && (
+        <div className="form-group1">
+          <p>{templateMessage}</p>
+        </div>
+      )}
+    </div>
+  </Container>
+</div>
       <Container>
         {selectedTemplate && (
           <div className="dates-style">
@@ -614,12 +660,28 @@ const InteractionList = () => {
                     >
                       Download (Excel)
                     </Button>
-                    {/* <TextField
+                    <TextField
                       label="Filter by Booth"
                       variant="outlined"
                       value={boothFilter}
-                      onChange={(e) => setBoothFilter(e.target.value)} 
-                    /> */}
+                      onChange={(e) => setBoothFilter(e.target.value)}
+                    />
+                    <TextField
+                      select
+                      label="Filter by Mandal"
+                      variant="outlined"
+                      value={mandalFilter}
+                      onChange={handleChange}
+                      sx={{ width: '200px' }}
+                    >
+                   
+                      {mandals.map((mandal) => (
+                        <MenuItem key={mandal._id} value={mandal.name}>
+                          {mandal.name}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+
                   </Box>
                 )} />
             )}

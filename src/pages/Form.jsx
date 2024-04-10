@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import TextField from "@mui/material/TextField";
 import TopNavBar from "./TopNav";
 import Spinner from "./Spinner";
+import { Autocomplete } from "@mui/material"
 function Form() {
   const [templates, setTemplates] = useState([]);
   const [name, setName] = useState("");
@@ -60,15 +61,12 @@ function Form() {
       console.error("Error fetching templates data:", error);
     }
   };
-
-  const handleTemplateChange = (e) => {
-    const selectedTemplateName = e.target.value;
-    const selectedTemplate = templates.find(
-      (template) => template.name === selectedTemplateName
-    );
-    setSelectedTemplate(selectedTemplateName);
+  const handleTemplateChange = (newValue) => {
+    const selectedTemplate = templates.find(template => template.name === newValue);
+    setSelectedTemplate(newValue);
     setTemplateMessage(selectedTemplate?.message || "");
   };
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -196,23 +194,23 @@ function Form() {
             onSubmit={handleSubmit}
             encType="multipart/form-data"
           >
-            <div className="form-group servey_type">
-              <select
-                className="form-group"
-                name="template"
-                id="template"
-                required
-                value={selectedTemplate}
-                onChange={handleTemplateChange}
-              >
-                <option value="">Survey Type</option>
-                {templates.map((template) => (
-                  <option key={template.name} value={template.name}>
-                    {template.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+             <div className="form-group servey_type">
+             <Autocomplete
+  value={selectedTemplate}
+  onChange={(event, newValue) => handleTemplateChange(newValue)}
+  options={templates.map((template) => template.name)}
+  renderInput={(params) => (
+    <TextField
+      {...params}
+      label="Survey Type"
+      variant="outlined"
+      required
+    />
+  )}
+/>
+
+    </div>
+
             {templateMessage && (
               <div className="form-group">
                 <p>{templateMessage}</p>

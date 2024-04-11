@@ -40,9 +40,9 @@ function Form() {
       };
 
       if (role === "admin") {
-        templatesAPI = "https://whatsapp.presentience.in/api/template";
+        templatesAPI = "https://wasurveyb.presentience.in/api/template";
       } else if (role === "user") {
-        templatesAPI = "https://whatsapp.presentience.in/api/user/templates";
+        templatesAPI = "https://wasurveyb.presentience.in/api/user/templates";
       } else {
         console.error("Invalid role:", role);
         return;
@@ -149,7 +149,7 @@ function Form() {
 
     try {
       const response = await fetch(
-        "https://whatsapp.presentience.in/api/send-message",
+        "https://wasurveyb.presentience.in/api/send-message",
         {
           method: "POST",
           headers: {

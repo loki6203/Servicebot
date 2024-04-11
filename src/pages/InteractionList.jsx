@@ -67,9 +67,9 @@ const InteractionList = () => {
       }
 
       if (role === 'admin') {
-        templatesAPI = 'https://whatsapp.presentience.in/api/template'
+        templatesAPI = 'https://wasurveyb.presentience.in/api/template'
       } else if (role === 'user') {
-        templatesAPI = 'https://whatsapp.presentience.in/api/user/templates'
+        templatesAPI = 'https://wasurveyb.presentience.in/api/user/templates'
       } else {
         console.error('Invalid role:', role)
         return
@@ -110,7 +110,7 @@ const InteractionList = () => {
           Authorization: `Bearer ${Token}`,
         }
 
-        const response = await fetch(`https://whatsapp.presentience.in/api/mandal/${templateId}`, { headers })
+        const response = await fetch(`https://wasurveyb.presentience.in/api/mandal/${templateId}`, { headers })
         if (response.ok) {
           const data = await response.json()
           if (data) {
@@ -154,7 +154,7 @@ const InteractionList = () => {
       }
 
       const response = await fetch(
-        "https://whatsapp.presentience.in/api/view-messages",
+        "https://wasurveyb.presentience.in/api/view-messages",
         {
           method: "POST",
           body: JSON.stringify(formData),
@@ -201,7 +201,7 @@ const InteractionList = () => {
       }
 
       const response = await fetch(
-        "https://whatsapp.presentience.in/api/messages/counts",
+        "https://wasurveyb.presentience.in/api/messages/counts",
         {
           method: "POST",
           body: JSON.stringify(formData),

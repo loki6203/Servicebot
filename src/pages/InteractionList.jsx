@@ -312,7 +312,6 @@ const combinedCounts = allResponses.reduce((acc, response) => {
   
     } catch (error) {
       console.error("Error fetching message counts data:", error);
-      setError(error.message);
     } finally {
       setIsdataLoading(false); // Set loading state to false regardless of success or error
     }

@@ -21,6 +21,9 @@ Chart.register(...registerables, ChartDataLabels)
 const InteractionList = () => {
   const [apiData, setApiData] = useState([])
   const [isLoading, setIsLoading] = useState(true)
+  const [isdataLoading, setIsdataLoading] = useState(false)
+  const [istableLoading, setIstableLoading] = useState(false)
+
   const [templates, setTemplates] = useState([])
   const [mandals, setMandals] = useState([])
   const [selectedTemplate, setSelectedTemplate] = useState("")
@@ -52,9 +55,15 @@ const InteractionList = () => {
     fetchTemplates()
 
   }, [])
-  const handleChange = (event) => {
-    setMandalFilter(event.target.value)
-  }
+  const handleChange = (event, newValue) => {
+    if (newValue === 'All') {
+        setMandalFilter(null);
+    } else {
+        setMandalFilter(newValue);
+    }
+};
+
+
 
   const fetchTemplates = async () => {
     try {
@@ -67,9 +76,9 @@ const InteractionList = () => {
       }
 
       if (role === 'admin') {
-        templatesAPI = 'https://wasurveyb.presentience.in/api/template'
+        templatesAPI = 'https://whatsapp.presentience.in/api/template'
       } else if (role === 'user') {
-        templatesAPI = 'https://wasurveyb.presentience.in/api/user/templates'
+        templatesAPI = 'https://whatsapp.presentience.in/api/user/templates'
       } else {
         console.error('Invalid role:', role)
         return
@@ -110,7 +119,7 @@ const InteractionList = () => {
           Authorization: `Bearer ${Token}`,
         }
 
-        const response = await fetch(`https://wasurveyb.presentience.in/api/mandal/${templateId}`, { headers })
+        const response = await fetch(`https://whatsapp.presentience.in/api/mandal/${templateId}`, { headers })
         if (response.ok) {
           const data = await response.json()
           if (data) {
@@ -143,86 +152,173 @@ const InteractionList = () => {
     await fetchMessageCounts(newValue);
   };
   const fetchData = async (selectedTemplateName) => {
+    setIstableLoading(true);
     try {
-      const formData = {
-        passcode: "7ab97576-6077-47ac-b9e2-e00548fe226d",
-        template: selectedTemplateName,
-        fromDate: fromDate ? dayjs(fromDate).toISOString() : null,
-        toDate: toDate ? dayjs(toDate).toISOString() : null,
-        ...(boothFilter && { booth_no: boothFilter }), 
-        ...(mandalFilter && { mandal_name: mandalFilter }), 
+      let templatesToFetch = [selectedTemplateName];
+  
+      // Check if the selectedTemplateName is one of the special templates
+      if (selectedTemplateName === 'medak_survey') {
+        templatesToFetch.push('medak_survey1');
+      } else if (selectedTemplateName === 'medak_survey1') {
+        templatesToFetch.push('medak_survey');
       }
-
-      const response = await fetch(
-        "https://wasurveyb.presentience.in/api/view-messages",
-        {
-          method: "POST",
-          body: JSON.stringify(formData),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      )
-
-      if (response.ok) {
-        const responseData = await response.json()
-
-        if (fromDate && toDate) {
-          const filteredMessages = responseData.messages.filter((message) => {
-            const statusUpdateTime = new Date(message.createdAt).getTime()
-            const fromTime = new Date(fromDate).getTime()
-            const toTime = new Date(toDate).getTime()
-            return statusUpdateTime >= fromTime && statusUpdateTime <= toTime
-          })
-          setApiData(filteredMessages)
-        } else {
-          setApiData(responseData.messages)
-        }
+  
+      const allResponses = await Promise.all(
+        templatesToFetch.map(async (template) => {
+          const formData = {
+            passcode: "7ab97576-6077-47ac-b9e2-e00548fe226d",
+            template: template,
+            fromDate: fromDate ? dayjs(fromDate).toISOString() : null,
+            toDate: toDate ? dayjs(toDate).toISOString() : null,
+            ...(boothFilter && { booth_no: boothFilter }), 
+            ...(mandalFilter && { mandal_name: mandalFilter }), 
+          };
+  
+          const response = await fetch(
+            "https://whatsapp.presentience.in/api/view-messages",
+            {
+              method: "POST",
+              body: JSON.stringify(formData),
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+  
+          if (response.ok) {
+            return await response.json();
+          } else {
+            throw new Error("Failed to fetch interaction data");
+          }
+        })
+      );
+  
+      let mergedMessages = [];
+  
+      allResponses.forEach((responseData) => {
+        const messagesMap = new Map();
+  
+        responseData.messages.forEach((message) => {
+          const phoneKey = message.phone;
+  
+          if (!messagesMap.has(phoneKey)) {
+            messagesMap.set(phoneKey, []);
+          }
+          
+          messagesMap.get(phoneKey).push(message);
+        });
+  
+        const uniqueMessagesArray = Array.from(messagesMap.values()).flatMap(messages => {
+          if (messages.some(message => message.username.isverified)) {
+            return messages.filter(message => message.username.isverified);
+          }
+          return messages;
+        });
+  
+        mergedMessages = [...mergedMessages, ...uniqueMessagesArray];
+      });
+  
+      console.log("Merged Messages:", mergedMessages);
+  
+      if (fromDate && toDate) {
+        const filteredMessages = mergedMessages.filter((message) => {
+          const statusUpdateTime = new Date(message.createdAt).getTime();
+          const fromTime = new Date(fromDate).getTime();
+          const toTime = new Date(toDate).getTime();
+          return statusUpdateTime >= fromTime && statusUpdateTime <= toTime;
+        });
+        console.log("Filtered Messages:", filteredMessages);
+  
+        setApiData(filteredMessages);
       } else {
-        console.error("Failed to fetch interaction data")
+        console.log("All Messages:", mergedMessages);
+        setApiData(mergedMessages);
       }
-
+  
     } catch (error) {
-      console.error("Error fetching interaction data:", error)
+      console.error("Error fetching interaction data:", error);
     } finally {
-      setIsLoading(false) // Stop the loading spinner after fetching data
+      setIstableLoading(false);
     }
   }
+  
+
+  
 
   const fetchMessageCounts = async (selectedTemplateName) => {
     try {
-      const formData = {
-        passcode: "7ab97576-6077-47ac-b9e2-e00548fe226d",
-        template: selectedTemplateName,
-        fromDate: fromDate ? dayjs(fromDate).toISOString() : null,
-        toDate: toDate ? dayjs(toDate).toISOString() : null,
-        ...(boothFilter && { booth_no: boothFilter }), 
-        ...(mandalFilter && { mandal_name: mandalFilter }),
+      setIsdataLoading(true); // Set loading state to true
+  
+      let templatesToFetch = [selectedTemplateName];
+  
+      // Check if the selectedTemplateName is one of the special templates
+      if (selectedTemplateName === 'medak_survey') {
+        templatesToFetch.push('medak_survey1');
+      } else if (selectedTemplateName === 'medak_survey1') {
+        templatesToFetch.push('medak_survey');
       }
+  
+      const allResponses = await Promise.all(
+        templatesToFetch.map(async (template) => {
+          const formData = {
+            passcode: "7ab97576-6077-47ac-b9e2-e00548fe226d",
+            template: template,
+            fromDate: fromDate ? dayjs(fromDate).toISOString() : null,
+            toDate: toDate ? dayjs(toDate).toISOString() : null,
+            ...(boothFilter && { booth_no: boothFilter }), 
+            ...(mandalFilter && { mandal_name: mandalFilter }),
+          }
+  
+          const response = await fetch(
+            "https://whatsapp.presentience.in/api/messages/counts",
+            {
+              method: "POST",
+              body: JSON.stringify(formData),
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+  
+          if (response.ok) {
+            return await response.json();
+          } else {
+            throw new Error(`Failed to fetch message counts data for ${template}`);
+          }
+        })
+      );
+  
+      // Combine the counts from all responses
+  // Combine the counts from all responses
+const combinedCounts = allResponses.reduce((acc, response) => {
+  for (const key in response.messageCounts) {
+    if (key === 'buttons') {
+      acc.buttons = acc.buttons || {};
 
-      const response = await fetch(
-        "https://wasurveyb.presentience.in/api/messages/counts",
-        {
-          method: "POST",
-          body: JSON.stringify(formData),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      )
-
-      if (response.ok) {
-        const responseData = await response.json()
-
-        setMessageCounts(responseData.messageCounts)
-        prepareChartData(responseData.messageCounts)
-      } else {
-        console.error("Failed to fetch message counts data")
+      // Loop through each button count in the current response
+      for (const buttonName in response.messageCounts.buttons) {
+        acc.buttons[buttonName] = (acc.buttons[buttonName] || 0) + response.messageCounts.buttons[buttonName];
       }
-    } catch (error) {
-      console.error("Error fetching message counts data:", error)
+    } else {
+      acc[key] = (acc[key] || 0) + response.messageCounts[key];
     }
   }
+  return acc;
+}, {});
+
+  
+      setMessageCounts(combinedCounts);
+      prepareChartData(combinedCounts);
+  
+    } catch (error) {
+      console.error("Error fetching message counts data:", error);
+      setError(error.message);
+    } finally {
+      setIsdataLoading(false); // Set loading state to false regardless of success or error
+    }
+  }
+  
+  
   useEffect(() => {
     if (selectedTemplate) {
       fetchData(selectedTemplate)
@@ -232,14 +328,14 @@ const InteractionList = () => {
 
   const prepareChartData = (messageCounts) => {
     const messageStatusDataColors = [
-      "rgba(75,192,192,1)",
+      "rgba(255,0,0,1)",
       "rgba(255, 206, 86, 1)",
       "rgba(54, 162, 235, 1)",
       "rgba(255, 159, 64, 1)",
     ]
 
     const messageStatusData = {
-      labels: ["Accepted", "Sent", "Read"],
+      labels: ["Failed", "Sent", "Delivered","Read"],
       datasets: [
         {
           label: "Message Status",
@@ -247,8 +343,9 @@ const InteractionList = () => {
           borderColor: "rgba(0,0,0,1)",
           borderWidth: 2,
           data: [
-            messageCounts.accepted || 0,
+            messageCounts.failed || 0,
             messageCounts.sent || 0,
+            messageCounts.delivered || 0,
             messageCounts.read || 0,
           ],
         },
@@ -314,19 +411,19 @@ const InteractionList = () => {
           anchor: 'end',
           align: 'top',
           formatter: (value, ctx) => {
-            // Check if percentages[ctx.dataIndex] is a valid number
             if (!isNaN(percentages[ctx.dataIndex]) && percentages[ctx.dataIndex] !== undefined) {
               const labelPercentage = percentages[ctx.dataIndex]
               return `${labelPercentage}%`
             }
-            return '' // Return an empty string if not a valid number
+            return '' 
           },
         },
         tooltip: {
           callbacks: {
             label: function (context) {
               const labelPercentage = percentages[context.dataIndex]
-              return `${context.label}: (${labelPercentage}%)`
+              const count = context.dataset.data[context.dataIndex];
+              return `${context.label}: ${count} votes`
             },
           },
         },
@@ -488,6 +585,8 @@ const InteractionList = () => {
     await fetchMessageCounts(selectedTemplate)
     setRefreshing(false)
   }
+  const mandalsWithAllOption = [{ name: 'All' }, ...mandals];
+  console.log(apiData)
   return (
     <>
       <TopNavBar />
@@ -603,91 +702,94 @@ const InteractionList = () => {
           </div>
         )}
       </Container>
-      <Container>
-        {selectedTemplate && (
-          <div className="box" >
-            <div className="charts-container">
-              {messageStatusData.datasets &&
-                messageStatusData.datasets.length > 0 && (
-                  <div className="chart">
-                    <h2>Survey Report Messages</h2>
-                    <Bar
-                      data={messageStatusData}
-                      options={{ scales: scaleOptions }}
-                    />
-                  </div>
-                )}
-              {buttonClicksData.datasets &&
-                buttonClicksData.datasets.length > 0 && (
-                  <div className="chart">
-                    <h2>Total Survey Replies: {total}</h2>
-                    <Bar data={buttonClicksData} options={chartOptions} />
-
-                  </div>
-                )}
-            </div>
-
-          </div>
-        )}
-      </Container>
-      <div className="app-table-container">
         <Container>
-          <div className="app-table-component">
-            {/* Conditionally render the loading spinner or the table */}
-            {isLoading || !selectedTemplate ? (
-              <>
-                <Spinner />
-                <h3>Please select survey type</h3>
-              </>
-            ) : null}
+        {selectedTemplate && !isdataLoading && (
+            <div className="box" >
+              <div className="charts-container">
+                {messageStatusData.datasets &&
+                  messageStatusData.datasets.length > 0 && (
+                    <div className="chart">
+                      <h2>Survey Report Messages</h2>
+                      <Bar
+                        data={messageStatusData}
+                        options={{ scales: scaleOptions }}
+                      />
+                    </div>
+                  )}
+                {buttonClicksData.datasets &&
+                  buttonClicksData.datasets.length > 0 && (
+                    <div className="chart">
+                      <h2>Total Survey Replies: {total}</h2>
+                      <Bar data={buttonClicksData} options={chartOptions} />
 
-            {!isLoading && selectedTemplate && (
-              <MaterialReactTable columns={columns} data={apiData || []}
-                renderTopToolbarCustomActions={({ table }) => (
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      gap: '16px',
-                      padding: '8px',
-                      flexWrap: 'wrap',
-                    }}
-                  >
-                    <Button
-                      disabled={table.getPrePaginationRowModel().rows.length === 0}
-                      onClick={() => exportCsv(table.getPrePaginationRowModel().rows, false)}
-                      startIcon={<FileDownloadIcon />}
-                      variant="outlined"
-                    >
-                      Download (Excel)
-                    </Button>
-                    <TextField
-                      label="Filter by Booth"
-                      variant="outlined"
-                      value={boothFilter}
-                      onChange={(e) => setBoothFilter(e.target.value)}
-                    />
-                    <TextField
-                      select
-                      label="Filter by Mandal"
-                      variant="outlined"
-                      value={mandalFilter}
-                      onChange={handleChange}
-                      sx={{ width: '200px' }}
-                    >
-                   
-                      {mandals.map((mandal) => (
-                        <MenuItem key={mandal._id} value={mandal.name}>
-                          {mandal.name}
-                        </MenuItem>
-                      ))}
-                    </TextField>
+                    </div>
+                  )}
+              </div>
 
-                  </Box>
-                )} />
-            )}
-          </div>
+            </div>
+          )}
         </Container>
-      </div>
+        <div className="app-table-container">
+          <Container>
+            <div className="app-table-component">
+              {(isLoading || istableLoading || !selectedTemplate) && (
+        <>
+          <Spinner />
+          {!selectedTemplate && <h3>Please select survey type</h3>}                </>
+            )}
+
+{!isLoading && !istableLoading && selectedTemplate && (
+                <MaterialReactTable columns={columns} data={apiData || []}
+                  renderTopToolbarCustomActions={({ table }) => (
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        gap: '16px',
+                        padding: '8px',
+                        flexWrap: 'wrap',
+                      }}
+                    >
+                      <Button
+                        disabled={table.getPrePaginationRowModel().rows.length === 0}
+                        onClick={() => exportCsv(table.getPrePaginationRowModel().rows, false)}
+                        startIcon={<FileDownloadIcon />}
+                        variant="outlined"
+                      >
+                        Download (Excel)
+                      </Button>
+                      <TextField
+                        label="Filter by Booth"
+                        variant="outlined"
+                        value={boothFilter}
+                        onChange={(e) => setBoothFilter(e.target.value)}
+                      />
+              <Autocomplete
+      value={mandalFilter}
+      onChange={(event, newValue) => handleChange(event, newValue)}
+      options={mandalsWithAllOption.map((option) => option.name)}
+      renderInput={(params) => (
+          <TextField
+              {...params}
+              label="Filter by Mandal"
+              variant="outlined"
+              sx={{ width: '200px' }}
+          />
+      )}
+      renderOption={(props, option) => (
+        <MenuItem {...props}>
+            {option === 'All' ? 'All' : option}
+        </MenuItem>
+    )}
+    
+  />
+
+
+                    </Box>
+                  )} />
+              )}
+            </div>
+          </Container>
+        </div>
 
     </>
   )

@@ -8,6 +8,7 @@ import Form from "./pages/Form";
 import InteractionList from "./pages/InteractionList";
 import Success from "./pages/Success";
 import UsersList from "./pages/UsersList";
+import NewForm from "./pages/NewForm"
 
 
 
@@ -18,6 +19,8 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/form" element={<Form />} />
+        <Route path="/newform" element={<NewForm />} />
+
         <Route path='/intlist' element={<InteractionList />} />
         <Route path='/userlist' element={<UsersList />} />
         <Route path="/success" element={<Success />} />

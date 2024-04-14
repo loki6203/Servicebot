@@ -34,7 +34,7 @@ const UsersList = () => {
 
   const fetchData = async () => {
     try {
-      const response = await fetch("https://wasurveyb.presentience.in/api/user/list");
+      const response = await fetch("https://whatsapp.presentience.in/api/user/list");
       if (response.ok) {
         const data = await response.json();
         setApiData(data.users);
@@ -49,7 +49,7 @@ const UsersList = () => {
 
   const fetchTemplates = async () => {
     try {
-      const response = await fetch("https://wasurveyb.presentience.in/api/template");
+      const response = await fetch("https://whatsapp.presentience.in/api/template");
       if (response.ok) {
         const data = await response.json();
         setTemplates(data.templates);
@@ -100,7 +100,7 @@ const UsersList = () => {
 
   const handleAssignTemplates = async () => {
     try {
-      const response = await fetch("https://wasurveyb.presentience.in/api/user/assign/templates", {
+      const response = await fetch("https://whatsapp.presentience.in/api/user/assign/templates", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -153,7 +153,7 @@ const UsersList = () => {
 
 const handleAddUser = async () => {
     try {
-      const response = await fetch("https://wasurveyb.presentience.in/api/user/create", {
+      const response = await fetch("https://whatsapp.presentience.in/api/user/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

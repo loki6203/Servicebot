@@ -40,9 +40,9 @@ function Form() {
       };
 
       if (role === "admin") {
-        templatesAPI = "https://wasurveyb.presentience.in/api/template";
+        templatesAPI = "https://whatsapp.presentience.in/api/template";
       } else if (role === "user") {
-        templatesAPI = "https://wasurveyb.presentience.in/api/user/templates";
+        templatesAPI = "https://whatsapp.presentience.in/api/user/templates";
       } else {
         console.error("Invalid role:", role);
         return;
@@ -149,7 +149,7 @@ function Form() {
 
     try {
       const response = await fetch(
-        "https://wasurveyb.presentience.in/api/send-message",
+        "https://whatsapp.presentience.in/api/send-message",
         {
           method: "POST",
           headers: {
@@ -184,8 +184,10 @@ function Form() {
 
       <div className="login-container">
         <div className="page-card">
+        <h2>User Details</h2>
           <div className="page-card-head">
-            <h2>User Details</h2>
+           
+            <Link to="/newform">New form</Link>
             <Link to="/intlist">View Interactions</Link>
           </div>
           <form

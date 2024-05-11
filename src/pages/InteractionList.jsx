@@ -156,13 +156,11 @@ const InteractionList = () => {
     try {
       let templatesToFetch = [selectedTemplateName];
   
-      // Check if the selectedTemplateName is one of the special templates
-      if (selectedTemplateName === 'medak_survey') {
-        templatesToFetch.push('medak_survey1');
-      } else if (selectedTemplateName === 'medak_survey1') {
-        templatesToFetch.push('medak_survey');
-      }
-  
+      if (selectedTemplateName === 'vijayawada_east_survey') {
+        templatesToFetch.push('vijayawada_new_survey');
+        templatesToFetch.push('vijayawada_gadde1');
+        templatesToFetch.push('vijayawada_gadde2');
+      } 
       const allResponses = await Promise.all(
         templatesToFetch.map(async (template) => {
           const formData = {
@@ -247,16 +245,15 @@ const InteractionList = () => {
 
   const fetchMessageCounts = async (selectedTemplateName) => {
     try {
-      setIsdataLoading(true); // Set loading state to true
+      setIsdataLoading(true); 
   
       let templatesToFetch = [selectedTemplateName];
   
-      // Check if the selectedTemplateName is one of the special templates
-      if (selectedTemplateName === 'medak_survey') {
-        templatesToFetch.push('medak_survey1');
-      } else if (selectedTemplateName === 'medak_survey1') {
-        templatesToFetch.push('medak_survey');
-      }
+      if (selectedTemplateName === 'vijayawada_east_survey') {
+        templatesToFetch.push('vijayawada_new_survey');
+        templatesToFetch.push('vijayawada_gadde1');
+        templatesToFetch.push('vijayawada_gadde2');
+      } 
   
       const allResponses = await Promise.all(
         templatesToFetch.map(async (template) => {
@@ -288,14 +285,11 @@ const InteractionList = () => {
         })
       );
   
-      // Combine the counts from all responses
-  // Combine the counts from all responses
 const combinedCounts = allResponses.reduce((acc, response) => {
   for (const key in response.messageCounts) {
     if (key === 'buttons') {
       acc.buttons = acc.buttons || {};
 
-      // Loop through each button count in the current response
       for (const buttonName in response.messageCounts.buttons) {
         acc.buttons[buttonName] = (acc.buttons[buttonName] || 0) + response.messageCounts.buttons[buttonName];
       }
@@ -313,7 +307,7 @@ const combinedCounts = allResponses.reduce((acc, response) => {
     } catch (error) {
       console.error("Error fetching message counts data:", error);
     } finally {
-      setIsdataLoading(false); // Set loading state to false regardless of success or error
+      setIsdataLoading(false);
     }
   }
   
